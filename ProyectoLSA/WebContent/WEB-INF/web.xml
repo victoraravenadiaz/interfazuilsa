@@ -17,6 +17,14 @@
       <servlet-name>Ingresar Licitación</servlet-name>
       <url-pattern>/ingresar</url-pattern>
  </servlet-mapping>  
+   <servlet>
+      <servlet-name>Licitaciones y Proveedores</servlet-name>
+      <jsp-file>/lista.jsp</jsp-file>
+ </servlet>
+ <servlet-mapping>
+      <servlet-name>Licitaciones y Proveedores</servlet-name>
+      <url-pattern>/lista</url-pattern>
+ </servlet-mapping>  
   
   
 </web-app>

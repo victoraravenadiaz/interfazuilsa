@@ -56,7 +56,7 @@
             <h2 class="title">Licit<span class="highlight">LSA</span></h2>
             <p class="intro">Una aplicación web hecha para Latent Semantic Analysis</p>
             <div class="btns">
-                <a class="btn btn-cta-secondary" href="http://themes.3rdwavemedia.com/" target="_blank">Ingresar una licitación</a>
+                <a class="btn btn-cta-secondary" href="ingresar" target="_blank">Ingresar una licitación</a>
             </div>
             <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
         </div><!--//container-->

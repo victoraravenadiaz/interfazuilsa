@@ -56,7 +56,7 @@
         <div class="container">
             <h2 class="title text-center">Ingresar Licitación</h2>
             <div class="row">
-                    <form id="contact_form" align="center" enctype="multipart/form-data">
+                    <form id="licitacion_form" action="lista" align="center" enctype="multipart/form-data">
                     <div class="row">
                         <label for="title" class="lead">Título:</label><br />
                         <input id="title" class="input" name="title" type="text" value="" size="30" style="color:#000000;"/><br />
