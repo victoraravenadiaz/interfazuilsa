@@ -13,7 +13,7 @@ public class Tagger {
                 "taggers/spanish-distsim.tagger");
  
      // The sample string
-        String s = "tengo tanta hambre que me comeria una vaca.";
+        String s = "Mi madre es una hermosa mujer.";
         String sample = s.replaceAll("\\W", " ");
 
         // The tagged string
@@ -27,7 +27,7 @@ public class Tagger {
 
         for(int i=0;i<x.length;i++)
         {
-            if (x[i].substring(x[i].lastIndexOf("_")+1).startsWith("n"))
+            if (x[i].substring(x[i].lastIndexOf("_")+1).startsWith("a"))
             {
                 list.add(x[i].split("_")[0]);
             }

@@ -27,6 +27,7 @@ public class Main {
 		String user = "postgres";
 		String password = "12345";
 		Licitacion licitacion = new Licitacion();
+		Vocabulario v = new Vocabulario();
 		
 		try {
 			Class.forName(driver);
@@ -39,9 +40,10 @@ public class Main {
 			while (rs.next()) {
 				licitacion.setCodigo(rs.getString("id_licitacion"));
 				licitacion.setLicitacion(rs.getString("nombre"));
-				System.out.println(licitacion.vocabulario());
+				System.out.println(licitacion.toString());
+				v.setLicitacion(licitacion);
+				System.out.println(v.vocabulario(""));
 			}
-			
 			
 			stmt.close();
 			con.close();
