@@ -54,6 +54,45 @@
     <section id="docs" class="docs section">
         <div class="container">
             <div class="docs-inner">
+                <h2 class="title text-center">Licitación </h2>      
+                <table class="table text-center">
+
+                    <thead>
+                        <tr>
+                            <td colspan="6"><h3>Licitaciones</h3></td>
+                        </tr>
+                        <tr class="info">
+                            <th class="col-md-2 text-center"><strong>Código</strong></th>
+                            <th class="col-md-2 text-center"><strong>Licitación</strong></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+        <!-- Aplicadas en las filas -->
+                        <tr class="active">
+                            <td>1000-13-LE13</td>
+                            <td>EVALUACIÓN Y REPARACIÓN DE DOS MOTONIVELADORAS</td> 
+                        </tr>
+                        <tr class="active">
+                            <td>1000-14-LE13</td>
+                            <td>Suministro camino Tomeco - Vega Blanca por Cerro</td> 
+                        </tr>
+                        <tr class="active">
+                            <td>1005-15-LE13</td>
+                            <td>Materiales para reparación de puentes y pasarelas</td> 
+                        </tr>
+                        <tr class="active">
+                            <td>1001-4-LP13</td>
+                            <td>Mantención y Reparación de Camionetas Chevrolet</td> 
+                        </tr>
+                        <tr class="active">
+                            <td>1002-29-L113</td>
+                            <td>CURSO CONDUCTOR PROFESIONAL CLASE A4-A5</td> 
+                        </tr>
+                    </tbody>
+                </table>      
+                <br /> <br />
+                
                 <h2 class="title text-center">Lista de licitaciones y sus proveedores recomendados</h2>      
                 <table class="table text-center">
 
@@ -92,6 +131,8 @@
                     </tbody>
                 </table>      
                 <br /> <br />
+                
+                
                 <table class="table text-center">
 
                     <thead>
