@@ -37,12 +37,17 @@ public class Main {
 
 			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
 
+			ArrayList<String> voc = new ArrayList<String>();
+			
 			while (rs.next()) {
 				licitacion.setCodigo(rs.getString("id_licitacion"));
 				licitacion.setLicitacion(rs.getString("nombre"));
 				System.out.println(licitacion.toString());
 				v.setLicitacion(licitacion);
-				System.out.println(v.vocabulario(""));
+				voc = v.vocabulario("adjetivo");
+				for(int i = 0; i < voc.size(); i++){
+					System.out.println(voc.get(i));
+				}
 			}
 			
 			stmt.close();
