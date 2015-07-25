@@ -88,7 +88,7 @@ public class LSI {
 			search(scales, termVectors, docVectors, args[m]);
 		}
 
-		System.out.println(cosine(termVectors[0], docVectors[1], scales));
+		System.out.println(cosine(termVectors[0], termVectors[1], scales));
 
 	}
 

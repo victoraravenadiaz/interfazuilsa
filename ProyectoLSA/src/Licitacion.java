@@ -52,7 +52,7 @@ public class Licitacion {
 	
 	public void removerCaracteres() {
 		 // Cadena de caracteres original a sustituir.
-	    String caracteres = ",.:-'¡!¿?/()[]";
+	    String caracteres = ",.:+-'¡!¿?/()[]";
 	    // Cadena de caracteres ASCII que reemplazarán los originales.
 	    for (int i=0; i<caracteres.length(); i++) {
 	        // Reemplazamos los caracteres especiales.
