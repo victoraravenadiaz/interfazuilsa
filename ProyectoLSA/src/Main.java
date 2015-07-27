@@ -21,23 +21,8 @@ public class Main {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		
 		AnalisisLSA a = new AnalisisLSA();
-		double[][] m = a.matrizTerminos();
-		String c = "Matriz términos-licitaciones: \n";
 		
-		for(int i = 0; i < m.length; i++){
-			c += "(";
-			for(int j = 0; j < m[0].length; j++){
-				c += (int) m[i][j];
-				if(j < m[0].length-1) {
-					c += " ";
-				}
-			}
-			c += ")\n";
-		}
-		
-		System.out.println(c);
-		a.analisisLSA();
-		
+		a.cosenoTerms();		
 		/*try {
 			Class.forName(driver);
 			Connection con = DriverManager.getConnection(connectString, user,

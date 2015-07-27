@@ -15,8 +15,6 @@ public class Vocabulario {
 		this.licitacion = licitacion;
 	}
 
-
-
 	public Licitacion getLicitacion() {
 		return licitacion;
 	}

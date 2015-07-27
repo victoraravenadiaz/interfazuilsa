@@ -87,8 +87,15 @@ public class LSI {
 		for (int m = 0; m < args.length; ++m) {
 			search(scales, termVectors, docVectors, args[m]);
 		}
-
-		System.out.println(cosine(termVectors[0], termVectors[1], scales));
+		
+		double[] xs = {termVectors[0][0], termVectors[1][0]};
+		
+		double[] ys = {termVectors[0][1], termVectors[1][1]};
+		
+		System.out.println("(" + xs[0] + "," + ys[0] + ")");
+		System.out.println("(" + xs[1] + "," + ys[1] + ")");
+		
+		System.out.printf("% 5.2f", cosine(xs, ys, scales));
 
 	}
 
