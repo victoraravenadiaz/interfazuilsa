@@ -1,6 +1,8 @@
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.io.File;
 import java.io.FileReader;
@@ -8,6 +10,7 @@ import java.io.IOException;
 import java.sql.*;
 
 import com.aliasi.matrix.SvdMatrix;
+import com.sun.xml.internal.ws.util.StringUtils;
 
 public class AnalisisLSA {
 
@@ -38,51 +41,138 @@ public class AnalisisLSA {
 	 * 
 	 * }
 	 */
-	
+	/**
+	 * 
+	 * @return
+	 */
+	public String[] terminosVocabulario() {
+
+
+		String driver = "org.postgresql.Driver"; //se declara una cadena de texto con el driver del motor de base de datos
+		String connectString = "jdbc:postgresql://localhost/vm31ene2014"; //se declara una cadena para hacer la conexión a la base de datos
+		String user = "postgres"; //se declara una cadena para conectar con el usuario del motor de base de datos
+		String password = "12345"; //se declara una cadena con la contraseña del motor
+		
+		Licitacion licitacion = new Licitacion(); // se declara un nuevo objeto de la clase Licitación
+		String[] vocabulario = null; //se declara un nuevo arreglo de cadenas vacío
+		Vocabulario v = new Vocabulario(); //Se declara un nuevo objeto de la clase Vocabulario
+		
+		try {
+			Class.forName(driver); //se llama al driver del motor de base de datos
+			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
+			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
+			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10"); //se ejecuta la consulta a la base de datos
+
+			/*
+			 * Lo que se hace mientras se recorre la base
+			 * de datos
+			 * */
+			String texto = "";
+			while (rs.next()) {
+				//TODO - QUITAR LOS STOP WORD
+				licitacion.setCodigo(rs.getString("id_licitacion"));
+				licitacion.setLicitacion(rs.getString("nombre"));
+				licitacion.removerCaracteres(); //para remover caracteres especiales
+				licitacion.removerAcentos(); //para remover acentos
+				licitacion.convertirAMinuscula(); //para convertir a mayúsculas
+				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
+						.getLicitacion())); //Se quitan espacios generados por la remoción de caracteres
+				texto += licitacion.getLicitacion();
+			}
+			vocabulario = v.vocabulario("sustantivo", texto);
+			Arrays.sort(vocabulario); //se ordenan los elementos del arreglo Palabras por orden alfabético
+			Set<String> todos = new HashSet<String>();
+			for (String s : vocabulario) {
+			      todos.add(s);
+			}
+			String[] vocabularioFinal = todos.toArray(new String[0]);
+			
+   System.out.println("VOCABULARIO =>"+vocabularioFinal.length);
+   			for (String s : vocabularioFinal) {
+   				System.out.println("=>"+s);
+   			}
+			/*
+			 * Se cierra la conexión y la declaración a la base de datos
+			 * */
+			stmt.close();
+			con.close();
+
+			return vocabularioFinal;
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		}
+
+		return null;
+
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
 	public String[] terminos() {
 
-		Licitacion licitacion = new Licitacion();
-		String driver = "org.postgresql.Driver";
-		String connectString = "jdbc:postgresql://localhost/vm31ene2014";
-		String user = "postgres";
-		String password = "12345";
-		String cadena = "";
-		String[] vocabulario = null;
-		String[] terminos = null;
-		String[] palabras;
-		Vocabulario v = new Vocabulario();
-		int cont = 0;
-		try {
-			Class.forName(driver);
-			Connection con = DriverManager.getConnection(connectString, user,
-					password);
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt
-					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
 
+		String driver = "org.postgresql.Driver"; //se declara una cadena de texto con el driver del motor de base de datos
+		String connectString = "jdbc:postgresql://localhost/vm31ene2014"; //se declara una cadena para hacer la conexión a la base de datos
+		String user = "postgres"; //se declara una cadena para conectar con el usuario del motor de base de datos
+		String password = "12345"; //se declara una cadena con la contraseña del motor
+		
+		Licitacion licitacion = new Licitacion(); // se declara un nuevo objeto de la clase Licitación
+		String cadena = ""; //se declara una nueva cadena vacía
+		String[] vocabulario = null; //se declara un nuevo arreglo de cadenas vacío
+		String[] terminos = null; //se declara otro arreglo de cadenas vac´´io
+		String[] palabras; //se declara otro arreglo de cadenas
+		Vocabulario v = new Vocabulario(); //Se declara un nuevo objeto de la clase Vocabulario
+		
+		try {
+			Class.forName(driver); //se llama al driver del motor de base de datos
+			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
+			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
+			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10"); //se ejecuta la consulta a la base de datos
+
+			/*
+			 * Lo que se hace mientras se recorre la base
+			 * de datos
+			 * */
 			while (rs.next()) {
 				licitacion.setCodigo(rs.getString("id_licitacion"));
 				licitacion.setLicitacion(rs.getString("nombre"));
 				licitacion.removerCaracteres(); //para remover caracteres especiales
 				licitacion.removerAcentos(); //para remover acentos
-				licitacion.convertirAMinuscula();
+				licitacion.convertirAMinuscula(); //para convertir a mayúsculas
 				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
-						.getLicitacion()));
-				vocabulario = v.vocabulario("sustantivo", licitacion.getLicitacion());
+						.getLicitacion())); //Se quitan espacios generados por la remoción de caracteres
+				
+				vocabulario = v.vocabulario("sustantivo", licitacion.getLicitacion()); //se pasa por parámetro el tipo de término a extraer y la licitación actual
+				
+				/*
+				 * Se recorre los elementos del arreglo vocabulario
+				 * */
 				for(int i = 0; i < vocabulario.length; i++){
-					cadena += vocabulario[i] + " ";
+					cadena += vocabulario[i] + " "; //se concatena con cada uno de los elementos del arreglo Vocabulario
 				}
 			}
-
-			palabras = cadena.split(" ");
-			Arrays.sort(palabras);
+			
+			palabras = cadena.split(" "); //se declara el arreglo de String Palabras separando los elementos del objeto Cadena
+			Arrays.sort(palabras); //se ordenan los elementos del arreglo Palabras por orden alfabético
 
 			String[] anuladas = new String[palabras.length]; // se llama a un nuevo arreglo de Strings para anular las palabras repetidas
 
+			/*
+			 * para evitar cualquier inconveniente,
+			 * se asigna cada elemento del
+			 * arreglo palabras al arreglo anuladas
+			 */
+			
 			for (int i = 0; i < anuladas.length; i++) {
-				anuladas[i] = palabras[i]; // para evitar cualquier inconveniente, se asigna cada elemento del arreglo palabras al arreglo anuladas
+				anuladas[i] = palabras[i];
 			}
 
+			/*
+			 * Para anular las palabras repetidas
+			 */
+			
 			for (int i = 0; i < anuladas.length; i++) {
 				for (int j = i + 1; j < palabras.length; j++) {
 					if (anuladas[j].equals(anuladas[i])) { // si hay una palabra repetida
@@ -92,7 +182,7 @@ public class AnalisisLSA {
 			}
 
 			/*
-			 * Para eliminar palabras anuladas repetidas
+			 * Para eliminar palabras anuladas
 			 */
 
 			terminos = new String[] {}; // se declara un arreglo de Strings nuevo, vacío
@@ -111,7 +201,7 @@ public class AnalisisLSA {
 				if (palabraYaExiste == false) { // si la palabra no existe
 
 					String[] vectorTemp = new String[terminos.length + 1]; // se declara un vector temporal
-
+					
 					for (int j = 0; j < terminos.length; j++) {
 						vectorTemp[j] = terminos[j]; // a cada elemento del vector temporal se le asigna el arreglo actual
 					}
@@ -121,6 +211,9 @@ public class AnalisisLSA {
 				}
 			}
 
+			/*
+			 * Se cierra la conexión y la declaración a la base de datos
+			 * */
 			stmt.close();
 			con.close();
 
@@ -131,7 +224,10 @@ public class AnalisisLSA {
 		return terminos;
 
 	}
-
+/**
+ * 
+ * @return
+ */
 	public String[] licitaciones() {
 
 		Licitacion licitacion = new Licitacion();
@@ -140,24 +236,25 @@ public class AnalisisLSA {
 		String user = "postgres";
 		String password = "12345";
 		String[] licitaciones = null;
-		int contador = 0;
+		//int contador = 0;
 		try {
 			Class.forName(driver);
 			Connection con = DriverManager.getConnection(connectString, user,
 					password);
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt
-					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-
-			while (rs.next()) {
-				licitacion.setCodigo(rs.getString("id_licitacion"));
-				licitacion.setLicitacion(rs.getString("nombre"));
-				contador++;
-			}
-
+//			ResultSet rs = stmt
+//					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10");
+//
+//			while (rs.next()) {
+//				licitacion.setCodigo(rs.getString("id_licitacion"));
+//				licitacion.setLicitacion(rs.getString("nombre"));
+//				System.out.println(licitacion.getLicitacion());
+//				contador++;
+//			}
+			licitaciones = new String[10];
+			
 			ResultSet rs1 = stmt
-					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-			licitaciones = new String[contador];
+					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10");
 			int cont = 0;
 			while (rs1.next()) {
 				licitacion.setCodigo(rs1.getString("id_licitacion"));
@@ -180,7 +277,12 @@ public class AnalisisLSA {
 		return licitaciones;
 
 	}
-
+/**
+ * 
+ * @param texto
+ * @param termino
+ * @return
+ */
 	public int ocurrencia(String texto, String termino) {
 
 		String cadena = texto;
@@ -198,25 +300,34 @@ public class AnalisisLSA {
 		return contador;
 
 	}
-
+/**
+ * 
+ * @return
+ */
 	public double[][] matrizTerminos() {
 
 		String[] terminos = this.terminos();
 		String[] licitaciones = this.licitaciones();
-
-		double[][] matriz = new double[terminos.length][licitaciones.length];
-	
-		for (int i = 0; i < terminos.length; i++) {
-			for(int j = 0; j < licitaciones.length; j++) {
-				matriz[i][j] = this.ocurrencia(licitaciones[j],
-						terminos[i]);
+		System.out.println(terminos.length);
+		System.out.println(licitaciones.length);
+		
+			double[][] matriz = new double[terminos.length][licitaciones.length];
+			
+			for (int i = 0; i < terminos.length; i++) {
+				for(int j = 0; j < licitaciones.length; j++) {
+					matriz[i][j] = this.ocurrencia(licitaciones[j],
+							terminos[i]);
+				}
+				
 			}
 			
-		}
+			return matriz;
 		
-		return matriz;
 	}
-
+/**
+ * 
+ * @return
+ */
 	public SvdMatrix matrizSVD() {
 
 		int numFactors = 2;
@@ -234,7 +345,10 @@ public class AnalisisLSA {
 		
 		return matrix;
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public double[] escalas() {
 
 		SvdMatrix matriz = this.matrizSVD();
@@ -282,8 +396,11 @@ public class AnalisisLSA {
 		String connectString = "jdbc:postgresql://localhost/bd_semantica";
 		String user = "postgres";
 		String password = "12345";
-		String[] terms = this.terminos();
+		System.out.println("CALCULOS DE TERMINOS");
+		String[] terms = this.terminosVocabulario();
+		System.out.println("LLENAR MATRIZ ESCALA");
 		double[] escalas = this.escalas();
+		System.out.println("LLENAR MATRIZ TERMINOS VECTOR");
 		double[][] terminosVectores = this.vectorTermLSA();
 		double cos = 0;
 		double[] xs = new double[2];

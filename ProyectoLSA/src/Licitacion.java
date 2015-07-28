@@ -56,7 +56,7 @@ public class Licitacion {
 	    // Cadena de caracteres ASCII que reemplazarán los originales.
 	    for (int i=0; i<caracteres.length(); i++) {
 	        // Reemplazamos los caracteres especiales.
-    		this.licitacion = this.licitacion.replaceAll("\\"+caracteres.charAt(i), "");
+    		this.licitacion = this.licitacion.replaceAll("\\"+caracteres.charAt(i), " ");
 	    }
 	}
 	
