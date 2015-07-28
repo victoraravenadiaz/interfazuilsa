@@ -47,8 +47,11 @@ public class AnalisisLSA {
 		String user = "postgres";
 		String password = "12345";
 		String cadena = "";
+		String[] vocabulario = null;
 		String[] terminos = null;
 		String[] palabras;
+		Vocabulario v = new Vocabulario();
+		int cont = 0;
 		try {
 			Class.forName(driver);
 			Connection con = DriverManager.getConnection(connectString, user,
@@ -60,12 +63,15 @@ public class AnalisisLSA {
 			while (rs.next()) {
 				licitacion.setCodigo(rs.getString("id_licitacion"));
 				licitacion.setLicitacion(rs.getString("nombre"));
-				licitacion.eliminarStopWords();
+				licitacion.removerCaracteres(); //para remover caracteres especiales
+				licitacion.removerAcentos(); //para remover acentos
 				licitacion.convertirAMinuscula();
-				licitacion.removerCaracteres();
 				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
 						.getLicitacion()));
-				cadena += licitacion.getLicitacion() + " ";
+				vocabulario = v.vocabulario("sustantivo", licitacion.getLicitacion());
+				for(int i = 0; i < vocabulario.length; i++){
+					cadena += vocabulario[i] + " ";
+				}
 			}
 
 			palabras = cadena.split(" ");
@@ -142,7 +148,6 @@ public class AnalisisLSA {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt
 					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-			licitaciones = new String[] {};
 
 			while (rs.next()) {
 				licitacion.setCodigo(rs.getString("id_licitacion"));
@@ -157,6 +162,10 @@ public class AnalisisLSA {
 			while (rs1.next()) {
 				licitacion.setCodigo(rs1.getString("id_licitacion"));
 				licitacion.setLicitacion(rs1.getString("nombre"));
+				licitacion.convertirAMinuscula();
+				licitacion.removerAcentos();
+				licitacion.removerCaracteres();
+				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion.getLicitacion()));
 				licitaciones[cont] = licitacion.getLicitacion();
 				cont++;
 			}
@@ -193,51 +202,18 @@ public class AnalisisLSA {
 	public double[][] matrizTerminos() {
 
 		String[] terminos = this.terminos();
+		String[] licitaciones = this.licitaciones();
 
-		Licitacion licitacion = new Licitacion();
-		String driver = "org.postgresql.Driver";
-		String connectString = "jdbc:postgresql://localhost/vm31ene2014";
-		String user = "postgres";
-		String password = "12345";
-		int contador = 0;
-		double[][] matriz = null;
-		try {
-			Class.forName(driver);
-			Connection con = DriverManager.getConnection(connectString, user,
-					password);
-			Statement stmt = con.createStatement();
-
-			ResultSet rs = stmt
-					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-			while (rs.next()) {
-				licitacion.setCodigo(rs.getString("id_licitacion"));
-				licitacion.setLicitacion(rs.getString("nombre"));
-				contador++;
+		double[][] matriz = new double[terminos.length][licitaciones.length];
+	
+		for (int i = 0; i < terminos.length; i++) {
+			for(int j = 0; j < licitaciones.length; j++) {
+				matriz[i][j] = this.ocurrencia(licitaciones[j],
+						terminos[i]);
 			}
-
-			matriz = new double[terminos.length][contador];
-			int cont2 = 0;
-			ResultSet rs1 = stmt
-					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-			while (rs1.next()) {
-				licitacion.setCodigo(rs1.getString("id_licitacion"));
-				licitacion.setLicitacion(rs1.getString("nombre"));
-				licitacion.eliminarStopWords();
-				licitacion.convertirAMinuscula();
-				licitacion.removerCaracteres();
-				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
-						.getLicitacion()));
-				for (int i = 0; i < terminos.length; i++) {
-					matriz[i][cont2] = this.ocurrencia(licitacion.getLicitacion(),
-							terminos[i]);
-				}
-				cont2++;
-			}
-
-		} catch (Exception e) {
-			System.out.print(e.getMessage());
+			
 		}
-
+		
 		return matriz;
 	}
 
@@ -342,6 +318,7 @@ public class AnalisisLSA {
 			con.close();
 
 		} catch (Exception e) {
+			System.out.println("¡Oh-oh! Algo salió mal");
 			System.out.print(e.getMessage());
 		}
 	}

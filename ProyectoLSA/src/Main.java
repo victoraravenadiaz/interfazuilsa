@@ -22,35 +22,7 @@ public class Main {
 		
 		AnalisisLSA a = new AnalisisLSA();
 		
-		a.cosenoTerms();		
-		/*try {
-			Class.forName(driver);
-			Connection con = DriverManager.getConnection(connectString, user,
-					password);
-			Statement stmt = con.createStatement();
-
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-
-			ArrayList<String> voc = new ArrayList<String>();
-			int cont;
-			
-			while (rs.next()) {
-				licitacion.setCodigo(rs.getString("id_licitacion"));
-				licitacion.setLicitacion(rs.getString("nombre"));
-				System.out.println(licitacion.toString());
-				v.setLicitacion(licitacion);
-				voc = v.vocabulario("");
-				for(int i = 0; i < voc.size(); i++){
-					cont = a.ocurrencia(licitacion, voc.get(i));
-					System.out.println(voc.get(i) + ": " + cont);
-				}
-			}
-			
-			stmt.close();
-			con.close();
-
-		} catch (Exception e) {
-			System.out.print(e.getMessage());
-		}*/
+		a.cosenoTerms();
+		
 	}
 }

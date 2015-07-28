@@ -13,7 +13,7 @@ public class Tagger {
                 "taggers/spanish-distsim.tagger");
  
      // The sample string
-        String s = "errar a tercera nivelacion es humano";
+        String s = "hola a todos";
         String sample = s.replaceAll("\\W", " ");
 
         // The tagged string
