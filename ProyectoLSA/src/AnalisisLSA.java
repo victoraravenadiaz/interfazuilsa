@@ -14,33 +14,9 @@ import com.sun.xml.internal.ws.util.StringUtils;
 
 public class AnalisisLSA {
 
-	/*
-	 * public ArrayList<String> licitaciones(){
-	 * 
-	 * Licitacion licitacion = new Licitacion(); String driver =
-	 * "org.postgresql.Driver"; String connectString =
-	 * "jdbc:postgresql://localhost/vm31ene2014"; String user = "postgres";
-	 * String password = "12345"; ArrayList<String> textos = new
-	 * ArrayList<String>();
-	 * 
-	 * try { Class.forName(driver); Connection con =
-	 * DriverManager.getConnection(connectString, user, password); Statement
-	 * stmt = con.createStatement();
-	 * 
-	 * ResultSet rs =
-	 * stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion");
-	 * while (rs.next()) { licitacion.setCodigo(rs.getString("id_licitacion"));
-	 * licitacion.setLicitacion(rs.getString("nombre"));
-	 * textos.add(licitacion.getLicitacion()); }
-	 * 
-	 * stmt.close(); con.close();
-	 * 
-	 * } catch (Exception e) { System.out.print(e.getMessage()); }
-	 * 
-	 * return textos;
-	 * 
-	 * }
-	 */
+	public AnalisisLSA() {
+	}
+
 	/**
 	 * 
 	 * @return
@@ -61,7 +37,7 @@ public class AnalisisLSA {
 			Class.forName(driver); //se llama al driver del motor de base de datos
 			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
 			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10"); //se ejecuta la consulta a la base de datos
+			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 200"); //se ejecuta la consulta a la base de datos
 
 			/*
 			 * Lo que se hace mientras se recorre la base
@@ -77,14 +53,16 @@ public class AnalisisLSA {
 				licitacion.convertirAMinuscula(); //para convertir a mayúsculas
 				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
 						.getLicitacion())); //Se quitan espacios generados por la remoción de caracteres
-				texto += licitacion.getLicitacion();
+				texto += licitacion.getLicitacion() + " ";
 			}
 			vocabulario = v.vocabulario("sustantivo", texto);
 			Arrays.sort(vocabulario); //se ordenan los elementos del arreglo Palabras por orden alfabético
 			Set<String> todos = new HashSet<String>();
+			
 			for (String s : vocabulario) {
 			      todos.add(s);
 			}
+			
 			String[] vocabularioFinal = todos.toArray(new String[0]);
 			
    System.out.println("VOCABULARIO =>"+vocabularioFinal.length);
@@ -129,7 +107,7 @@ public class AnalisisLSA {
 			Class.forName(driver); //se llama al driver del motor de base de datos
 			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
 			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10"); //se ejecuta la consulta a la base de datos
+			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 200"); //se ejecuta la consulta a la base de datos
 
 			/*
 			 * Lo que se hace mientras se recorre la base
@@ -242,23 +220,15 @@ public class AnalisisLSA {
 			Connection con = DriverManager.getConnection(connectString, user,
 					password);
 			Statement stmt = con.createStatement();
-//			ResultSet rs = stmt
-//					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10");
-//
-//			while (rs.next()) {
-//				licitacion.setCodigo(rs.getString("id_licitacion"));
-//				licitacion.setLicitacion(rs.getString("nombre"));
-//				System.out.println(licitacion.getLicitacion());
-//				contador++;
-//			}
+			ResultSet rs = stmt
+				.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 200");
+
 			licitaciones = new String[10];
 			
-			ResultSet rs1 = stmt
-					.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 10");
 			int cont = 0;
-			while (rs1.next()) {
-				licitacion.setCodigo(rs1.getString("id_licitacion"));
-				licitacion.setLicitacion(rs1.getString("nombre"));
+			while (rs.next()) {
+				licitacion.setCodigo(rs.getString("id_licitacion"));
+				licitacion.setLicitacion(rs.getString("nombre"));
 				licitacion.convertirAMinuscula();
 				licitacion.removerAcentos();
 				licitacion.removerCaracteres();
@@ -304,9 +274,9 @@ public class AnalisisLSA {
  * 
  * @return
  */
-	public double[][] matrizTerminos() {
+	public double[][] matrizTerminos(String[] terms) {
 
-		String[] terminos = this.terminos();
+		String[] terminos = terms;
 		String[] licitaciones = this.licitaciones();
 		System.out.println(terminos.length);
 		System.out.println(licitaciones.length);
@@ -328,7 +298,7 @@ public class AnalisisLSA {
  * 
  * @return
  */
-	public SvdMatrix matrizSVD() {
+	public SvdMatrix matrizSVD(String[] terms) {
 
 		int numFactors = 2;
 		double featureInit = 0.01;
@@ -338,8 +308,9 @@ public class AnalisisLSA {
 		double minImprovement = 0.0000;
 		int minEpochs = 10;
 		int maxEpochs = 50000;
+		double[][] matriz = this.matrizTerminos(terms);
 
-		SvdMatrix matrix = SvdMatrix.svd(this.matrizTerminos(), numFactors,
+		SvdMatrix matrix = SvdMatrix.svd(matriz, numFactors,
 				featureInit, initialLearningRate, annealingRate,
 				regularization, null, minImprovement, minEpochs, maxEpochs);
 		
@@ -349,26 +320,26 @@ public class AnalisisLSA {
 	 * 
 	 * @return
 	 */
-	public double[] escalas() {
+	public double[] escalas(String[] terms) {
 
-		SvdMatrix matriz = this.matrizSVD();
+		SvdMatrix matriz = this.matrizSVD(terms);
 		double[] escalas = matriz.singularValues();
 		
 		return escalas;
 	}
 	
-	public double[][] vectorTermLSA() {
+	public double[][] vectorTermLSA(String[] terms) {
 
-		SvdMatrix matriz = this.matrizSVD();
+		SvdMatrix matriz = this.matrizSVD(terms);
 		
 		double[][] termVectors = matriz.leftSingularVectors();
 		
 		return termVectors;
 	}
 	
-	public double[][] vectorDocLSA(String[] terminos) {
+	public double[][] vectorDocLSA(String[] terms) {
 
-		SvdMatrix matriz = this.matrizSVD();
+		SvdMatrix matriz = this.matrizSVD(terms);
 		
 		double[][] docVectors = matriz.rightSingularVectors();
 		
@@ -399,9 +370,9 @@ public class AnalisisLSA {
 		System.out.println("CALCULOS DE TERMINOS");
 		String[] terms = this.terminosVocabulario();
 		System.out.println("LLENAR MATRIZ ESCALA");
-		double[] escalas = this.escalas();
+		double[] escalas = this.escalas(terms);
 		System.out.println("LLENAR MATRIZ TERMINOS VECTOR");
-		double[][] terminosVectores = this.vectorTermLSA();
+		double[][] terminosVectores = this.vectorTermLSA(terms);
 		double cos = 0;
 		double[] xs = new double[2];
 		double[] ys = new double[2];
