@@ -37,7 +37,7 @@ public class AnalisisLSA {
 			Class.forName(driver); //se llama al driver del motor de base de datos
 			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
 			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 200"); //se ejecuta la consulta a la base de datos
+			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 100"); //se ejecuta la consulta a la base de datos
 
 			/*
 			 * Lo que se hace mientras se recorre la base
@@ -107,7 +107,7 @@ public class AnalisisLSA {
 			Class.forName(driver); //se llama al driver del motor de base de datos
 			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
 			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 200"); //se ejecuta la consulta a la base de datos
+			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 100"); //se ejecuta la consulta a la base de datos
 
 			/*
 			 * Lo que se hace mientras se recorre la base
@@ -221,7 +221,7 @@ public class AnalisisLSA {
 					password);
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt
-				.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 200");
+				.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 100");
 
 			licitaciones = new String[10];
 			
@@ -346,19 +346,13 @@ public class AnalisisLSA {
 		return docVectors;
 	}
 	
-	public double coseno(double[] xs, double[] ys, double[] scales) {
-		double product = 0.0;
-		double xsLengthSquared = 0.0;
-		double ysLengthSquared = 0.0;
-		for (int k = 0; k < xs.length; ++k) {
-			double sqrtScale = Math.sqrt(scales[k]);
-			double scaledXs = sqrtScale * xs[k];
-			double scaledYs = sqrtScale * ys[k];
-			xsLengthSquared += scaledXs * scaledXs;
-			ysLengthSquared += scaledYs * scaledYs;
-			product += scaledXs * scaledYs;
-		}
-		return product / Math.sqrt(xsLengthSquared * ysLengthSquared);
+	public double coseno(double[] xs, double[] ys) {
+        
+		double product = (xs[0]*xs[1]) + (ys[0]*ys[1]);
+		double valor1 = Math.sqrt((xs[0]*xs[0])) + Math.sqrt((ys[0]*ys[0]));
+		double valor2 = Math.sqrt((xs[1]*xs[1])) + Math.sqrt((ys[1]*ys[1]));
+		
+		return product / (valor1*valor2);
 	}
 	
 	public void cosenoTerms(){
@@ -369,8 +363,6 @@ public class AnalisisLSA {
 		String password = "12345";
 		System.out.println("CALCULOS DE TERMINOS");
 		String[] terms = this.terminosVocabulario();
-		System.out.println("LLENAR MATRIZ ESCALA");
-		double[] escalas = this.escalas(terms);
 		System.out.println("LLENAR MATRIZ TERMINOS VECTOR");
 		double[][] terminosVectores = this.vectorTermLSA(terms);
 		double cos = 0;
@@ -393,7 +385,7 @@ public class AnalisisLSA {
 					xs[1] = terminosVectores[j][0];
 					ys[0] = terminosVectores[i][1];
 					ys[1] = terminosVectores[j][1];
-					cos = this.coseno(xs, ys, escalas);
+					cos = this.coseno(xs, ys);
 					System.out.println("Coseno entre " + terms[i] + " y " + terms[j] + " = " + cos);
 					pst.setString(1, terms[i]);
 		            pst.setString(2, terms[j]);
