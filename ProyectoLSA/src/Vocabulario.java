@@ -29,7 +29,7 @@ public class Vocabulario {
         ArrayList<String> lista = new ArrayList<String>();
 		String[] vocabulario = null;
         
-        if(opcion.equals("sustantivo")){
+        if(opcion.equals("sustantivo") && (texto.length() > 2)){
         	
         	// The sample string
             sample = texto.replaceAll("\\W", " ");
@@ -47,6 +47,7 @@ public class Vocabulario {
                 if (palabras[i].substring(palabras[i].lastIndexOf("_")+1).startsWith("n"))
                 {
                 	lista.add(palabras[i].split("_")[0]);
+                	System.out.println(palabras[i]);
                 }
             }
         	

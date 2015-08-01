@@ -1,211 +1,19 @@
-import java.text.Normalizer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.*;
 
 import com.aliasi.matrix.SvdMatrix;
-import com.sun.xml.internal.ws.util.StringUtils;
 
 public class AnalisisLSA {
 
 	public AnalisisLSA() {
 	}
-
+	
 	/**
 	 * 
 	 * @return
 	 */
-	public String[] terminosVocabulario() {
-
-
-		String driver = "org.postgresql.Driver"; //se declara una cadena de texto con el driver del motor de base de datos
-		String connectString = "jdbc:postgresql://localhost/vm31ene2014"; //se declara una cadena para hacer la conexión a la base de datos
-		String user = "postgres"; //se declara una cadena para conectar con el usuario del motor de base de datos
-		String password = "12345"; //se declara una cadena con la contraseña del motor
-		
-		Licitacion licitacion = new Licitacion(); // se declara un nuevo objeto de la clase Licitación
-		String[] vocabulario = null; //se declara un nuevo arreglo de cadenas vacío
-		Vocabulario v = new Vocabulario(); //Se declara un nuevo objeto de la clase Vocabulario
-		
-		try {
-			Class.forName(driver); //se llama al driver del motor de base de datos
-			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
-			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 100"); //se ejecuta la consulta a la base de datos
-
-			/*
-			 * Lo que se hace mientras se recorre la base
-			 * de datos
-			 * */
-			String texto = "";
-			while (rs.next()) {
-				//TODO - QUITAR LOS STOP WORD
-				licitacion.setCodigo(rs.getString("id_licitacion"));
-				licitacion.setLicitacion(rs.getString("nombre"));
-				licitacion.removerCaracteres(); //para remover caracteres especiales
-				licitacion.removerAcentos(); //para remover acentos
-				licitacion.convertirAMinuscula(); //para convertir a mayúsculas
-				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
-						.getLicitacion())); //Se quitan espacios generados por la remoción de caracteres
-				texto += licitacion.getLicitacion() + " ";
-			}
-			vocabulario = v.vocabulario("sustantivo", texto);
-			Arrays.sort(vocabulario); //se ordenan los elementos del arreglo Palabras por orden alfabético
-			Set<String> todos = new HashSet<String>();
-			
-			for (String s : vocabulario) {
-			      todos.add(s);
-			}
-			
-			String[] vocabularioFinal = todos.toArray(new String[0]);
-			
-   System.out.println("VOCABULARIO =>"+vocabularioFinal.length);
-   			for (String s : vocabularioFinal) {
-   				System.out.println("=>"+s);
-   			}
-			/*
-			 * Se cierra la conexión y la declaración a la base de datos
-			 * */
-			stmt.close();
-			con.close();
-
-			return vocabularioFinal;
-		} catch (Exception e) {
-			System.out.print(e.getMessage());
-		}
-
-		return null;
-
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String[] terminos() {
-
-
-		String driver = "org.postgresql.Driver"; //se declara una cadena de texto con el driver del motor de base de datos
-		String connectString = "jdbc:postgresql://localhost/vm31ene2014"; //se declara una cadena para hacer la conexión a la base de datos
-		String user = "postgres"; //se declara una cadena para conectar con el usuario del motor de base de datos
-		String password = "12345"; //se declara una cadena con la contraseña del motor
-		
-		Licitacion licitacion = new Licitacion(); // se declara un nuevo objeto de la clase Licitación
-		String cadena = ""; //se declara una nueva cadena vacía
-		String[] vocabulario = null; //se declara un nuevo arreglo de cadenas vacío
-		String[] terminos = null; //se declara otro arreglo de cadenas vac´´io
-		String[] palabras; //se declara otro arreglo de cadenas
-		Vocabulario v = new Vocabulario(); //Se declara un nuevo objeto de la clase Vocabulario
-		
-		try {
-			Class.forName(driver); //se llama al driver del motor de base de datos
-			Connection con = DriverManager.getConnection(connectString, user, password); //Se hace la conexión a la base de datos
-			Statement stmt = con.createStatement(); //Se crea un objeto de clase Statement
-			ResultSet rs = stmt.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 100"); //se ejecuta la consulta a la base de datos
-
-			/*
-			 * Lo que se hace mientras se recorre la base
-			 * de datos
-			 * */
-			while (rs.next()) {
-				licitacion.setCodigo(rs.getString("id_licitacion"));
-				licitacion.setLicitacion(rs.getString("nombre"));
-				licitacion.removerCaracteres(); //para remover caracteres especiales
-				licitacion.removerAcentos(); //para remover acentos
-				licitacion.convertirAMinuscula(); //para convertir a mayúsculas
-				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion
-						.getLicitacion())); //Se quitan espacios generados por la remoción de caracteres
-				
-				vocabulario = v.vocabulario("sustantivo", licitacion.getLicitacion()); //se pasa por parámetro el tipo de término a extraer y la licitación actual
-				
-				/*
-				 * Se recorre los elementos del arreglo vocabulario
-				 * */
-				for(int i = 0; i < vocabulario.length; i++){
-					cadena += vocabulario[i] + " "; //se concatena con cada uno de los elementos del arreglo Vocabulario
-				}
-			}
-			
-			palabras = cadena.split(" "); //se declara el arreglo de String Palabras separando los elementos del objeto Cadena
-			Arrays.sort(palabras); //se ordenan los elementos del arreglo Palabras por orden alfabético
-
-			String[] anuladas = new String[palabras.length]; // se llama a un nuevo arreglo de Strings para anular las palabras repetidas
-
-			/*
-			 * para evitar cualquier inconveniente,
-			 * se asigna cada elemento del
-			 * arreglo palabras al arreglo anuladas
-			 */
-			
-			for (int i = 0; i < anuladas.length; i++) {
-				anuladas[i] = palabras[i];
-			}
-
-			/*
-			 * Para anular las palabras repetidas
-			 */
-			
-			for (int i = 0; i < anuladas.length; i++) {
-				for (int j = i + 1; j < palabras.length; j++) {
-					if (anuladas[j].equals(anuladas[i])) { // si hay una palabra repetida
-						anuladas[j] = ""; // se anula la palabra repetida
-					}
-				}
-			}
-
-			/*
-			 * Para eliminar palabras anuladas
-			 */
-
-			terminos = new String[] {}; // se declara un arreglo de Strings nuevo, vacío
-
-			for (int i = 0; i < palabras.length; i++) {
-				String palabra = palabras[i]; // se declara un String con el elemento actual del arreglo de Strings palabra
-				boolean palabraYaExiste = false; // un boolean para determinar si la palabra ya existe
-
-				for (int j = 0; j < terminos.length; j++) {
-					if (terminos[j].equals(palabra)) { // si el elemento actual coincide con el String analizado
-						palabraYaExiste = true; // palabraYaExiste se declara verdadero
-						break;
-					}
-				}
-
-				if (palabraYaExiste == false) { // si la palabra no existe
-
-					String[] vectorTemp = new String[terminos.length + 1]; // se declara un vector temporal
-					
-					for (int j = 0; j < terminos.length; j++) {
-						vectorTemp[j] = terminos[j]; // a cada elemento del vector temporal se le asigna el arreglo actual
-					}
-
-					vectorTemp[terminos.length] = palabra; // al último elemento del vector temporal se le asigna el String analizado
-					terminos = vectorTemp; // el vector a poblar se iguala con el Vector Temporal
-				}
-			}
-
-			/*
-			 * Se cierra la conexión y la declaración a la base de datos
-			 * */
-			stmt.close();
-			con.close();
-
-		} catch (Exception e) {
-			System.out.print(e.getMessage());
-		}
-
-		return terminos;
-
-	}
-/**
- * 
- * @return
- */
 	public String[] licitaciones() {
 
 		Licitacion licitacion = new Licitacion();
@@ -221,19 +29,36 @@ public class AnalisisLSA {
 					password);
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt
-				.executeQuery("SELECT * FROM licitacion ORDER BY id_licitacion LIMIT 100");
+				.executeQuery("SELECT id,id_licitacion,nombre FROM licitacion ORDER BY id");
 
-			licitaciones = new String[10];
+			
+			licitaciones = new String[27204];
 			
 			int cont = 0;
 			while (rs.next()) {
 				licitacion.setCodigo(rs.getString("id_licitacion"));
-				licitacion.setLicitacion(rs.getString("nombre"));
+				licitacion.setId(rs.getInt("id"));
+				// OTRO SELECT PARA TRAER EL TEXTO DE LOS PRODYUCTOS /SERVICIOS
+				String textoLicitacion = "";
+				
+				System.out.println("SELECT  nombre,descripcion FROM producto_servicio "
+						+ "	WHERE licitacion_id='"+licitacion.getId()+"' ORDER BY id ");
+				Statement stmtProductoServicio = con.createStatement(); 
+				ResultSet rsProdServ = stmtProductoServicio.executeQuery("SELECT  nombre,descripcion FROM producto_servicio "
+						+ "	WHERE licitacion_id='"+licitacion.getId()+"' ORDER BY id");
+				while (rsProdServ.next()) {
+					textoLicitacion += rsProdServ.getString("nombre")+ " "+ rsProdServ.getString("descripcion");
+				}
+				stmtProductoServicio.close();
+			        
+				textoLicitacion = rs.getString("nombre") + " " + textoLicitacion;
+				licitacion.setLicitacion(textoLicitacion);
 				licitacion.convertirAMinuscula();
 				licitacion.removerAcentos();
 				licitacion.removerCaracteres();
 				licitacion.setLicitacion(licitacion.quitaEspacios(licitacion.getLicitacion()));
 				licitaciones[cont] = licitacion.getLicitacion();
+				System.out.println(cont);
 				cont++;
 			}
 
@@ -246,7 +71,52 @@ public class AnalisisLSA {
 
 		return licitaciones;
 
+		}
+
+	/**
+	 * Este método retorna un arreglo de String
+	 * con los términos de un vocabulario según
+	 * el tipo de término que se le asigne
+	 * (ej. sustantivo, adjetivo, verbo)
+	 * 
+	 * @return
+	 */
+		
+	public String[] terminosVocabulario(String[] licitaciones) {
+
+		
+		String[] vocabulario = null; //se declara un nuevo arreglo de cadenas vacío
+		Vocabulario v = new Vocabulario(); //Se declara un nuevo objeto de la clase Vocabulario
+		String texto = "";
+		
+		for (int i = 0; i < licitaciones.length; i++) {
+			texto += licitaciones[i] + " ";
+			System.out.println(licitaciones[i]);
+		}
+		
+		vocabulario = v.vocabulario("sustantivo", texto);
+		Arrays.sort(vocabulario); //se ordenan los elementos del arreglo Palabras por orden alfabético
+		Set<String> todos = new HashSet<String>();
+			
+		for (String s : vocabulario) {
+			todos.add(s);
+			System.out.println(s);
+		}
+			
+		String[] vocabularioFinal = todos.toArray(new String[0]);
+			
+		System.out.println("VOCABULARIO =>"+vocabularioFinal.length);
+		for (String s : vocabularioFinal) {
+			System.out.println("=>"+s);
+			System.out.println(s);
+		}
+			/*
+			 * Se cierra la conexión y la declaración a la base de datos
+			 * */
+		return vocabularioFinal;
+
 	}
+
 /**
  * 
  * @param texto
@@ -274,10 +144,10 @@ public class AnalisisLSA {
  * 
  * @return
  */
-	public double[][] matrizTerminos(String[] terms) {
+	public double[][] matrizTerminos(String[] terms, String[] lics) {
 
 		String[] terminos = terms;
-		String[] licitaciones = this.licitaciones();
+		String[] licitaciones = lics;
 		System.out.println(terminos.length);
 		System.out.println(licitaciones.length);
 		
@@ -298,7 +168,7 @@ public class AnalisisLSA {
  * 
  * @return
  */
-	public SvdMatrix matrizSVD(String[] terms) {
+	public SvdMatrix matrizSVD(String[] terms, String[] lics) {
 
 		int numFactors = 2;
 		double featureInit = 0.01;
@@ -308,11 +178,12 @@ public class AnalisisLSA {
 		double minImprovement = 0.0000;
 		int minEpochs = 10;
 		int maxEpochs = 50000;
-		double[][] matriz = this.matrizTerminos(terms);
+		double[][] matriz = this.matrizTerminos(terms, lics);
 
 		SvdMatrix matrix = SvdMatrix.svd(matriz, numFactors,
 				featureInit, initialLearningRate, annealingRate,
 				regularization, null, minImprovement, minEpochs, maxEpochs);
+
 		
 		return matrix;
 	}
@@ -320,40 +191,34 @@ public class AnalisisLSA {
 	 * 
 	 * @return
 	 */
-	public double[] escalas(String[] terms) {
+	public double[] escalas(String[] terms, String[] lics) {
 
-		SvdMatrix matriz = this.matrizSVD(terms);
+		SvdMatrix matriz = this.matrizSVD(terms, lics);
 		double[] escalas = matriz.singularValues();
 		
 		return escalas;
 	}
 	
-	public double[][] vectorTermLSA(String[] terms) {
+	public double[][] vectorTermLSA(String[] terms, String[] lics) {
 
-		SvdMatrix matriz = this.matrizSVD(terms);
+		SvdMatrix matriz = this.matrizSVD(terms, lics);
 		
 		double[][] termVectors = matriz.leftSingularVectors();
 		
 		return termVectors;
 	}
 	
-	public double[][] vectorDocLSA(String[] terms) {
+	public double[][] vectorDocLSA(String[] terms, String[] lics) {
 
-		SvdMatrix matriz = this.matrizSVD(terms);
+		SvdMatrix matriz = this.matrizSVD(terms, lics);
 		
 		double[][] docVectors = matriz.rightSingularVectors();
 		
 		return docVectors;
 	}
 	
-	public double coseno(double[] xs, double[] ys) {
-        
-		double product = (xs[0]*xs[1]) + (ys[0]*ys[1]);
-		double valor1 = Math.sqrt((xs[0]*xs[0])) + Math.sqrt((ys[0]*ys[0]));
-		double valor2 = Math.sqrt((xs[1]*xs[1])) + Math.sqrt((ys[1]*ys[1]));
-		
-		return product / (valor1*valor2);
-	}
+	
+	
 	
 	public void cosenoTerms(){
 		
@@ -361,36 +226,62 @@ public class AnalisisLSA {
 		String connectString = "jdbc:postgresql://localhost/bd_semantica";
 		String user = "postgres";
 		String password = "12345";
+		;
+		System.out.println("Licitaciones...");
+		String[] lics = this.licitaciones();
 		System.out.println("CALCULOS DE TERMINOS");
-		String[] terms = this.terminosVocabulario();
+		String[] terms = this.terminosVocabulario(lics);
+		System.out.println("Escalas...");
+		double[] escalas = this.escalas(terms, lics);
 		System.out.println("LLENAR MATRIZ TERMINOS VECTOR");
-		double[][] terminosVectores = this.vectorTermLSA(terms);
+		double[][] terminosVectores = this.vectorTermLSA(terms, lics);
 		double cos = 0;
-		double[] xs = new double[2];
-		double[] ys = new double[2];
+		double prod_cruz = 0;
 		
+		double[] xs = new double[2];
+		double[] ys = new double[2];		
 		
 		try {
 			Class.forName(driver);
 			Connection con = DriverManager.getConnection(connectString, user,
 					password);
 			Statement stmt = con.createStatement();
+
+			PreparedStatement dropTable = con.prepareStatement(
+					String.format("DROP TABLE IF EXISTS vector_coseno CASCADE"));
+			dropTable.execute();
+			
+			String sql = "CREATE TABLE vector_coseno"
+					+ "( id serial NOT NULL,"
+					+ "palabra1 character varying(255) NOT NULL,"
+					+ "palabra2 character varying(255),"
+					+ "coseno double precision NOT NULL,"
+					+ "producto_cruz double precision NOT NULL,"
+					+ "CONSTRAINT id PRIMARY KEY (id) )";
+			
+			stmt.executeUpdate(sql);
+			
 			String stm = "INSERT INTO vector_coseno" +
-            		" (palabra1, palabra2, coseno) " +
-            		" VALUES(?,?, ?)";
+            		" (palabra1, palabra2, coseno, producto_cruz) " +
+            		" VALUES(?, ?, ?, ?)";
 			PreparedStatement pst = con.prepareStatement(stm);
 			for(int i = 0; i < terms.length; i++){
 				for(int j = i+1; j < terms.length; j++){
 					xs[0] = terminosVectores[i][0];
 					xs[1] = terminosVectores[j][0];
-					ys[0] = terminosVectores[i][1];
-					ys[1] = terminosVectores[j][1];
-					cos = this.coseno(xs, ys);
-					System.out.println("Coseno entre " + terms[i] + " y " + terms[j] + " = " + cos);
-					pst.setString(1, terms[i]);
-		            pst.setString(2, terms[j]);
-		            pst.setDouble(3, cos);
-		            pst.executeUpdate();
+					ys[1] = terminosVectores[i][1];
+					ys[0] = terminosVectores[j][1];
+					cos = CalculoVector.cosine(xs, ys, escalas);
+					prod_cruz = CalculoVector.dotProduct(xs, ys, escalas);
+					if(cos > 0.5) {
+						System.out.println("Coseno/P.Cruz entre " + terms[i] + " - " + terms[j] + " = " + cos +"  " + prod_cruz);
+						pst.setString(1, terms[i]);
+			            pst.setString(2, terms[j]);
+			            pst.setDouble(3, cos);
+			            pst.setDouble(4, prod_cruz);
+			            pst.executeUpdate();
+					}
+					
 				}
 			}
 

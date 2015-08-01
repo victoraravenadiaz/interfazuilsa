@@ -1,0 +1,13 @@
+Existen muchas formas de importar una base de datos
+en PostgreSQL que fue exportada a través de un DUMP.
+
+Sin embargo, si es que ninguno de los comandos sugeridos
+funciona, el comando que tiene mayor posibilidad de funcionar
+es el siguiente:
+
+psql -U postgres -d yourdbname < dumpfile
+
+donde -U antecede al nombre de usuario (por defecto en PostgreSQL
+se define "postgres" como usuario), -d al nombre de la base de datos,
+lo cual va seguido del símbolo <, el cual antecede al archivo dump
+de la base de datos.

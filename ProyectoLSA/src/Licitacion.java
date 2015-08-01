@@ -9,12 +9,20 @@ import java.util.regex.Pattern;
 
 
 public class Licitacion {
-
+	private int id;
 	private String codigo;
 	private String licitacion;
 	
 	public Licitacion() {
 	
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public Licitacion(String codigo, String licitacion) {
